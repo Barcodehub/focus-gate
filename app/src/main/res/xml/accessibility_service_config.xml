@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    A propósito NO se restringe android:packageNames aquí: el servicio
+    necesita observar el cambio de ventana en primer plano de CUALQUIER
+    app, porque la lista de "apps protegidas" es configurable por el
+    usuario en tiempo de ejecución. El filtrado real (solo AnkiDroid para
+    clics, solo apps protegidas cacheadas para cambios de ventana) se hace
+    en código dentro de GateAccessibilityService.
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeViewClicked|typeWindowStateChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagReportViewIds|flagRetrieveInteractiveWindows"
+    android:canRetrieveWindowContent="true"
+    android:notificationTimeout="50"
+    android:description="@string/accessibility_service_description" />

@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FocusGate</string>
+    <string name="service_label">FocusGate Gate Service</string>
+    <string name="accessibility_service_description">
+        Detecta tus respuestas en AnkiDroid para asignarte puntos, y
+        detecta cuándo abres una app protegida para comprobar tu saldo.
+        No lee ni modifica ninguna otra información de otras apps.
+    </string>
+</resources>
