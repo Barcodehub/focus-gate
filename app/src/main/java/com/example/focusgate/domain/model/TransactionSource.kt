@@ -8,5 +8,6 @@ package com.example.focusgate.domain.model
 enum class TransactionSource {
     ANKI_ANSWER,
     APP_UNLOCK,
-    MANUAL_ADJUSTMENT
+    MANUAL_ADJUSTMENT,
+    TASK_COMPLETED
 }

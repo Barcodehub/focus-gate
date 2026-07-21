@@ -19,6 +19,7 @@ import com.example.focusgate.ui.config.PointsConfigScreen
 import com.example.focusgate.ui.dashboard.DashboardScreen
 import com.example.focusgate.ui.history.HistoryScreen
 import com.example.focusgate.ui.protectedapps.ProtectedAppsScreen
+import com.example.focusgate.ui.tasks.TasksScreen
 
 @Composable
 fun FocusGateNavHost() {
@@ -58,6 +59,7 @@ fun FocusGateNavHost() {
             composable(Destination.Dashboard.route) { DashboardScreen() }
             composable(Destination.ProtectedApps.route) { ProtectedAppsScreen() }
             composable(Destination.Config.route) { PointsConfigScreen() }
+            composable(Destination.Tasks.route) { TasksScreen() }
             composable(Destination.History.route) { HistoryScreen() }
         }
     }

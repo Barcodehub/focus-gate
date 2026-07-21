@@ -3,9 +3,11 @@ package com.example.focusgate.di
 import android.content.Context
 import androidx.room.Room
 import com.example.focusgate.data.local.AppDatabase
+import com.example.focusgate.data.local.MIGRATION_1_2
 import com.example.focusgate.data.local.dao.PointsConfigDao
 import com.example.focusgate.data.local.dao.PointsTransactionDao
 import com.example.focusgate.data.local.dao.ProtectedAppDao
+import com.example.focusgate.data.local.dao.TaskDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +22,13 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, "focusgate.db").build()
+        Room.databaseBuilder(context, AppDatabase::class.java, "focusgate.db")
+            .addMigrations(MIGRATION_1_2)
+            .build()
+
+
+    @Provides
+    fun provideTaskDao(db: AppDatabase): TaskDao = db.taskDao()
 
     @Provides
     fun providePointsTransactionDao(db: AppDatabase): PointsTransactionDao = db.pointsTransactionDao()

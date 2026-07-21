@@ -3,9 +3,11 @@ package com.example.focusgate.di
 import com.example.focusgate.data.repository.PointsConfigRepositoryImpl
 import com.example.focusgate.data.repository.PointsRepositoryImpl
 import com.example.focusgate.data.repository.ProtectedAppRepositoryImpl
+import com.example.focusgate.data.repository.TaskRepositoryImpl
 import com.example.focusgate.domain.repository.PointsConfigRepository
 import com.example.focusgate.domain.repository.PointsRepository
 import com.example.focusgate.domain.repository.ProtectedAppRepository
+import com.example.focusgate.domain.repository.TaskRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -27,4 +29,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPointsConfigRepository(impl: PointsConfigRepositoryImpl): PointsConfigRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTaskRepository(impl: TaskRepositoryImpl): TaskRepository
 }
