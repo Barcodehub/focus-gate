@@ -1,91 +1,124 @@
-# FocusGate
+# FocusAnki
 
-App personal para Android que obliga a estudiar inglés en AnkiDroid antes de
-poder abrir apps de entretenimiento (Instagram, TikTok, YouTube, etc).
-Uso exclusivamente personal, sin root, sin modificar AnkiDroid.
+App para Android que te obliga a estudiar en **AnkiDroid** antes de poder abrir
+las apps que te distraen (Instagram, TikTok, YouTube, etc.). Cada respuesta en
+Anki te da puntos y cada app protegida cuesta puntos para abrirla.
 
-## Cómo probarlo
+Hecha por **Brayan Barco** · Licencia MIT · Sin root, sin modificar AnkiDroid,
+sin internet.
 
-1. Abre el proyecto en Android Studio (Hedgehog o más reciente). Al
-   sincronizar, Android Studio genera automáticamente el
-   `gradle-wrapper.jar` (no se incluye en el zip porque requiere descarga
-   desde internet).
-2. Instala la app en tu dispositivo real (un `AccessibilityService` con
-   overlay no tiene mucho sentido en emulador, pero también funciona ahí
-   si quieres probar antes).
-3. Abre FocusGate. En la pestaña **Inicio** verás dos tarjetas de permisos:
-   - **Servicio de accesibilidad**: actívalo desde el botón "Activar
-     ahora" (te lleva a Ajustes > Accesibilidad).
-   - **Mostrar sobre otras apps**: actívalo igual (te lleva al ajuste de
-     overlay específico de esta app).
-4. Ve a la pestaña **Apps**, toca "+", busca Instagram/TikTok/YouTube (o
-   cualquier otra), y define cuántos puntos cuesta abrirla.
-5. Ve a la pestaña **Config** y ajusta los puntos por Again/Hard/Good/Easy
-   si quieres cambiar los valores por defecto (0/2/5/8) y los minutos de
-   la sesión de desbloqueo (por defecto 2).
-6. Abre AnkiDroid y responde tarjetas: verás tu saldo subir en la pestaña
-   **Inicio**.
-7. Intenta abrir una app protegida: si tienes puntos suficientes se
-   descuentan automáticamente y la app abre normal; si no, aparece la
-   pantalla de bloqueo con la opción de ir a estudiar o volver al inicio.
+## Cómo funciona
+
+1. Respondes tarjetas en AnkiDroid: **Again / Hard / Good / Easy** suman puntos
+   (por defecto 0 / 2 / 5 / 8).
+2. Eliges qué apps proteger y cuántos puntos cuesta abrir cada una.
+3. Al abrir una app protegida:
+   - con saldo suficiente, se descuenta el costo y tienes una **sesión**
+     (2 minutos por defecto). Al terminar, si sigues dentro de la app, se
+     vuelve a cobrar o se bloquea;
+   - sin saldo, aparece una pantalla de bloqueo con acceso directo a AnkiDroid.
+
+## Instalación
+
+Descarga el APK desde el repositorio de releases:
+<https://github.com/Barcodehub/FocusAnki-releases/releases>
+
+1. Instala el APK (permite "instalar apps desconocidas" si Android lo pide).
+2. Abre FocusAnki y, en **Inicio**, concede dos permisos:
+   - **Servicio de accesibilidad** (Ajustes > Accesibilidad). En Android 13+,
+     al instalar fuera de la tienda aparece bloqueado: abre
+     *Ajustes > Apps > FocusAnki > ⋮ > Permitir ajustes restringidos* y vuelve
+     a intentarlo.
+   - **Mostrar sobre otras apps**.
+3. En **Apps** toca "+" y elige las apps a proteger (AnkiDroid y FocusAnki no
+   se pueden proteger).
+4. En **Config** ajusta los puntos por botón (0–1000) y los minutos de sesión
+   (1–240).
+5. Para que el bloqueo sea fiable, excluye FocusAnki de la optimización de
+   batería de tu fabricante.
+
+## Compilar desde el código
+
+Requisitos: JDK 17+ y Android SDK (API 34). El wrapper de Gradle va incluido.
+
+```bash
+./gradlew :app:testDebugUnitTest   # tests unitarios
+./gradlew :app:assembleDebug       # APK debug (con panel de diagnóstico)
+./gradlew :app:assembleRelease     # APK minificado con R8
+```
+
+Para firmar el release con tu propia llave, crea `keystore.properties` en la
+raíz (está en `.gitignore`):
+
+```properties
+storeFile=C:/ruta/a/tu.jks
+storePassword=...
+keyAlias=...
+keyPassword=...
+```
+
+Las llaves (`*.jks`, `*.keystore`) nunca deben subirse al repositorio.
 
 ## Arquitectura
 
 ```
 domain/        modelos + interfaces de repositorio + casos de uso (sin Android)
 data/          Room (entidades, DAOs) + implementaciones de repositorio
-accessibility/ AccessibilityService + controlador del overlay (WindowManager+Compose)
+accessibility/ AccessibilityService, overlay de bloqueo y mapeo de botones de Anki
 system/        utilidades de plataforma (permisos, listado de apps instaladas)
 ui/            pantallas Compose + ViewModels (uno por pantalla)
 di/            módulos de Hilt
 ```
 
-Ver los comentarios en `GateAccessibilityService.kt`, `OverlayController.kt`
-y `PointsTransactionDao.kt` (gasto atómico con `@Transaction`) para el
-razonamiento detallado de cada decisión.
+Kotlin, Jetpack Compose, Room, Hilt y corrutinas. Cada movimiento de puntos se
+guarda en `points_transactions` con `timestamp`, `delta`, `reason` y `source`
+(`ANKI_ANSWER`, `APP_UNLOCK`, ...), por lo que estadísticas, rachas o logros se
+pueden añadir después sin cambiar el esquema. El gasto es atómico
+(`@Transaction` en `PointsTransactionDao`).
 
-### Por qué es fácil agregar Estadísticas / Rachas / Logros
-
-Cada movimiento de puntos (ganado por Anki o gastado al desbloquear una
-app) se guarda como una fila en `points_transactions` con `timestamp`,
-`delta`, `reason` y `source` (`ANKI_ANSWER` / `APP_UNLOCK` /
-`MANUAL_ADJUSTMENT`). Esa tabla ya es la fuente de verdad para cualquier
-análisis futuro:
-
-- **Estadísticas**: un `ObserveDailyPointsUseCase` que agrupe
-  `points_transactions` por día usando el `timestamp`.
-- **Rachas**: un caso de uso que recorra los días con al menos una
-  transacción `ANKI_ANSWER` y calcule días consecutivos.
-- **Logros**: reglas declarativas evaluadas contra el mismo historial
-  (p. ej. "100 respuestas Easy seguidas", "7 días de racha").
-
-Ninguno de estos requiere tocar el esquema de Room existente ni el
-`AccessibilityService`; solo se añaden nuevos casos de uso y pantallas que
-leen `ObservePointsHistoryUseCase`.
-
-## Permisos y por qué
+## Permisos
 
 | Permiso | Para qué |
 |---|---|
-| Accessibility Service | Detectar clics en AnkiDroid y cambios de ventana en primer plano de otras apps. Se concede manualmente en Ajustes (Android no permite hacerlo por código). |
-| `SYSTEM_ALERT_WINDOW` ("Mostrar sobre otras apps") | Dibujar la pantalla de bloqueo por encima de la app protegida. |
-| `<queries>` con intent MAIN/LAUNCHER (no `QUERY_ALL_PACKAGES`) | Listar las apps instaladas para el selector de "apps a proteger", sin pedir el permiso sensible de listar *todos* los paquetes. |
+| Servicio de accesibilidad | Detectar las respuestas en AnkiDroid y qué app está en primer plano. Android exige concederlo manualmente. |
+| `SYSTEM_ALERT_WINDOW` ("Mostrar sobre otras apps") | Dibujar la pantalla de bloqueo sobre la app protegida. |
+| `<queries>` MAIN/LAUNCHER (no `QUERY_ALL_PACKAGES`) | Listar las apps abribles para el selector de apps a proteger. |
 
-## Limitaciones conocidas
+No hay permiso `INTERNET`: la app no puede enviar datos a ningún sitio.
 
-- La heurística de detección de botones de Anki (`ease1`..`ease4` + texto
-  "Again/Hard/Good/Easy" en inglés/español) puede necesitar ajuste si tu
-  versión de AnkiDroid cambia esos identificadores. El POC anterior incluía
-  un volcado de árbol de depuración; se puede reincorporar aquí de la misma
-  forma si hace falta.
-- El servicio de accesibilidad recibe eventos de **todas** las apps (no
-  solo AnkiDroid) porque la lista de apps protegidas es configurable; esto
-  implica algo más de consumo de batería que una restricción fija por
-  `packageNames`.
-- El overlay requiere que el usuario haya concedido manualmente el
-  permiso "Mostrar sobre otras apps"; si lo revoca, el bloqueo deja de
-  mostrarse (aunque el descuento de puntos/registro de Anki sigue
-  funcionando).
-- Para máxima fiabilidad en segundo plano, se recomienda además excluir la
-  app de la optimización de batería del fabricante (esto varía mucho
-  entre marcas y no se automatiza en este POC).
+## Privacidad
+
+- Todo es local. `allowBackup=false` y las reglas de extracción excluyen la
+  base de datos de copias de seguridad y transferencias entre dispositivos.
+- El servicio de accesibilidad recibe eventos de todas las apps (clics y
+  cambios de ventana) porque las apps protegidas son configurables. El código
+  solo actúa sobre AnkiDroid y las apps protegidas, y en **release** no registra
+  ni guarda nada de lo que ocurre (logs y panel de diagnóstico existen solo en
+  debug).
+
+## Modelo de amenazas y límites
+
+FocusAnki es una herramienta de **autocontrol**, no un control parental: quien
+tiene el teléfono puede desactivar el servicio, desinstalar la app o editar los
+costos. Lo que sí evita son el uso accidental y los atajos fáciles:
+
+- Entradas validadas (costos ≥ 1, límites en puntos, minutos y textos).
+- Los botones de Anki se detectan por id (`ease1`..`ease4`) o texto exacto; un
+  mazo llamado "Easy…" o un texto que solo empiece con "Good" no suma puntos.
+- Bajar la barra de notificaciones o abrir el teclado no quita el bloqueo.
+- Si AnkiDroid no está instalado, "Estudiar" lleva al inicio en vez de
+  destapar la app protegida.
+
+Limitaciones conocidas:
+
+- Nada impide pulsar botones de respuesta en Anki sin estudiar (AnkiDroid no
+  expone una señal verificable).
+- El sistema puede matar el servicio en segundo plano en algunos fabricantes.
+- Un servicio de accesibilidad que bloquea otras apps no cumple las políticas
+  de Google Play; se distribuye como APK.
+- Si una versión futura de AnkiDroid cambia los ids de los botones, el mapeo
+  habrá que ajustarlo (`AnkiButtonMapper`).
+
+## Licencia
+
+MIT © 2026 Brayan Alexander Barco. Ver [LICENSE](LICENSE).

@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FocusGate"
+rootProject.name = "FocusAnki"
 include(":app")

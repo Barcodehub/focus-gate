@@ -23,6 +23,7 @@ captures/
 Thumbs.db
 
 # Signing keys
+keystore.properties
 *.jks
 *.keystore
 *.p12
