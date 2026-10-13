@@ -19,7 +19,6 @@ import io.github.barcodehub.focusanki.ui.config.PointsConfigScreen
 import io.github.barcodehub.focusanki.ui.dashboard.DashboardScreen
 import io.github.barcodehub.focusanki.ui.history.HistoryScreen
 import io.github.barcodehub.focusanki.ui.protectedapps.ProtectedAppsScreen
-import io.github.barcodehub.focusanki.ui.tasks.TasksScreen
 
 @Composable
 fun FocusAnkiNavHost() {
@@ -59,7 +58,6 @@ fun FocusAnkiNavHost() {
             composable(Destination.Dashboard.route) { DashboardScreen() }
             composable(Destination.ProtectedApps.route) { ProtectedAppsScreen() }
             composable(Destination.Config.route) { PointsConfigScreen() }
-            composable(Destination.Tasks.route) { TasksScreen() }
             composable(Destination.History.route) { HistoryScreen() }
         }
     }

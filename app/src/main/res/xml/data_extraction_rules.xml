@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Los puntos, tareas e historial son datos locales: no se respaldan en la nube ni se transfieren. -->
+<!-- Los puntos y el historial son datos locales: no se respaldan en la nube ni se transfieren. -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="root" />

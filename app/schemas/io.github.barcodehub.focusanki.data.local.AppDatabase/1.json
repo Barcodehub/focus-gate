@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 2,
-    "identityHash": "dbd4908dcb24657fdbeb2e71df9be497",
+    "version": 1,
+    "identityHash": "c3208153161751aedd45f665b5fdfc7b",
     "entities": [
       {
         "tableName": "points_transactions",
@@ -135,74 +135,12 @@
         },
         "indices": [],
         "foreignKeys": []
-      },
-      {
-        "tableName": "tasks",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT, `points` INTEGER NOT NULL, `completed` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `lastCompletedAt` INTEGER, `lastResetAt` INTEGER)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "title",
-            "columnName": "title",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "description",
-            "columnName": "description",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "points",
-            "columnName": "points",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "completed",
-            "columnName": "completed",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "createdAt",
-            "columnName": "createdAt",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "lastCompletedAt",
-            "columnName": "lastCompletedAt",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
-            "fieldPath": "lastResetAt",
-            "columnName": "lastResetAt",
-            "affinity": "INTEGER",
-            "notNull": false
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dbd4908dcb24657fdbeb2e71df9be497')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c3208153161751aedd45f665b5fdfc7b')"
     ]
   }
 }

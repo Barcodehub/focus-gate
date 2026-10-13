@@ -8,6 +8,5 @@ package io.github.barcodehub.focusanki.domain.model
 enum class TransactionSource {
     ANKI_ANSWER,
     APP_UNLOCK,
-    MANUAL_ADJUSTMENT,
-    TASK_COMPLETED
+    MANUAL_ADJUSTMENT
 }
